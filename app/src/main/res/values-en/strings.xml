@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">WeatherStation</string>
+    <string name="weather_api_key">CWA-CB81412C-82BF-412B-AF1C-E4E0139F89D2</string>
+    <string name="location_loading">Location Loading…</string>
+    <string name="temperature_loading">Temperature Loading…</string>
+    <string name="high_loading_low_loading">High: Loading… Low: Loading…</string>
+    <string name="granted_permission_title">Please agree to all permissions</string>
+    <string name="granted_permission_message">Please agree to all permissions. If you refuse, you will not be able to use full functions. Do you want to continue?…</string>
+    <string name="button_continue">continue</string>
+    <string name="button_exit">exit</string>
+</resources>
