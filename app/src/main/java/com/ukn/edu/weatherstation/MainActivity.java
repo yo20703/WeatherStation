@@ -19,6 +19,9 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.TextView;
 
+import com.google.gson.Gson;
+import com.ukn.edu.weatherstation.weather.WeatherData;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -47,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
             requestLocationUpdate();
         }
 
+        readWeatherJson();
     }
 
     private void initLayout() {
@@ -55,6 +59,16 @@ public class MainActivity extends AppCompatActivity {
         highLowTemperatureTextView = findViewById(R.id.highLowTemperatureTextView);
         hourWeatherRecyclerView = findViewById(R.id.hourWeatherRecyclerView);
         tenDaysWeatherRecyclerView = findViewById(R.id.tenDaysWeatherRecyclerView);
+    }
+
+    private void readWeatherJson(){
+        AssetFileReader assetFileReader = new AssetFileReader();
+        String weatherJson = assetFileReader.readAssetFile(this, "weather.json");
+        Log.i("readWeatherJson1", weatherJson);
+
+        Gson gson = new Gson();
+        WeatherData weatherData = gson.fromJson(weatherJson, WeatherData.class);
+        Log.i("readWeatherJson1", "parser: ");
     }
 
     private void updateLocationInfo(double lat, double lng) {
@@ -77,13 +91,14 @@ public class MainActivity extends AppCompatActivity {
     private void requestLocationUpdate() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             LocationManager locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
-            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 10 * 1000, 10, new LocationListener() {
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0.5f, new LocationListener() {
                 @Override
                 public void onLocationChanged(@NonNull Location location) {
-                    Log.i("onLocationChanged", location.getLatitude() + "," + location.getLongitude());
+                        Log.i("onLocationChanged", location.getLatitude() + "," + location.getLongitude());
                     updateLocationInfo(location.getLatitude(), location.getLongitude());
                 }
             });
+
         }
 
 
