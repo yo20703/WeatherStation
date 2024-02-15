@@ -21,6 +21,7 @@ import android.widget.TextView;
 
 import com.google.gson.Gson;
 import com.ukn.edu.weatherstation.weather.WeatherData;
+import com.ukn.edu.weatherstation.weather.WeatherView;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -28,9 +29,8 @@ import java.util.List;
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
-    TextView locationTextViw;
-    TextView currentTemperatureTextView;
-    TextView highLowTemperatureTextView;
+    WeatherView wv;
+    TextView locationTextView;
     RecyclerView hourWeatherRecyclerView;
     RecyclerView tenDaysWeatherRecyclerView;
     private final int REQUEST_PERMISSION_CODE = 100;
@@ -50,25 +50,21 @@ public class MainActivity extends AppCompatActivity {
             requestLocationUpdate();
         }
 
-        readWeatherJson();
     }
 
     private void initLayout() {
-        locationTextViw = findViewById(R.id.locationTextView);
-        currentTemperatureTextView = findViewById(R.id.currentTemperatureTextView);
-        highLowTemperatureTextView = findViewById(R.id.highLowTemperatureTextView);
-        hourWeatherRecyclerView = findViewById(R.id.hourWeatherRecyclerView);
-        tenDaysWeatherRecyclerView = findViewById(R.id.tenDaysWeatherRecyclerView);
+        wv = findViewById(R.id.wv);
+        locationTextView = findViewById(R.id.locationTextView);
+//        hourWeatherRecyclerView = findViewById(R.id.hourWeatherRecyclerView);
+//        tenDaysWeatherRecyclerView = findViewById(R.id.tenDaysWeatherRecyclerView);
     }
 
-    private void readWeatherJson(){
+    private WeatherData readWeatherJson(){
         AssetFileReader assetFileReader = new AssetFileReader();
         String weatherJson = assetFileReader.readAssetFile(this, "weather.json");
         Log.i("readWeatherJson1", weatherJson);
 
-        Gson gson = new Gson();
-        WeatherData weatherData = gson.fromJson(weatherJson, WeatherData.class);
-        Log.i("readWeatherJson1", "parser: ");
+        return new Gson().fromJson(weatherJson, WeatherData.class);
     }
 
     private void updateLocationInfo(double lat, double lng) {
@@ -79,13 +75,79 @@ public class MainActivity extends AppCompatActivity {
                 Address address = addresses.get(0);
                 String cityName = address.getLocality();
                 String adminArea = address.getAdminArea();
-                locationTextViw.setText(cityName + "," + adminArea);
+                locationTextView.setText(cityName);
 
+                updateUI(adminArea);
                 Log.i("updateLocationInfo", "cityName: " + cityName + ", adminArea: " + adminArea);
             }
         } catch (IOException e) {
             Log.e("updateLocationInfo", e.toString());
         }
+    }
+
+    private void updateUI(String adminArea) {
+        WeatherData.Location location = getWeatherByCity(adminArea);
+        WeatherData.WeatherElement wxElement = getWeatherElementByName(location, "Wx");
+        if(wxElement != null && wxElement.getTime().size() > 0){
+            String datetimeAreaString = wxElement.getTime().get(0).getStartTime() + "~" + wxElement.getTime().get(0).getEndTime();
+            wv.datetimeTextView.setText(datetimeAreaString);
+            wv.currentWeatherTextView.setText(wxElement.getTime().get(0).getParameter().getParameterName());
+        }
+
+        WeatherData.WeatherElement minTElement = getWeatherElementByName(location, "MinT");
+        WeatherData.WeatherElement maxTElement = getWeatherElementByName(location, "MaxT");
+        if(minTElement != null && maxTElement != null && minTElement.getTime().size() > 0 && maxTElement.getTime().size() > 0) {
+            String maxTString = maxTElement.getTime().get(0).getParameter().getParameterName()
+                    + "°" + maxTElement.getTime().get(0).getParameter().getParameterUnit();
+            String minTString = minTElement.getTime().get(0).getParameter().getParameterName()
+                    + "°" + minTElement.getTime().get(0).getParameter().getParameterUnit();
+            wv.highLowTemperatureTextView.setText(maxTString + "/" + minTString);
+        }
+
+        WeatherData.WeatherElement popElement = getWeatherElementByName(location, "PoP");
+        if(popElement != null && popElement.getTime().size() > 0){
+            String rainfallChanceString = popElement.getTime().get(0).getParameter().getParameterName();
+            wv.rainfallChanceTextView.setText("降雨機率：" + rainfallChanceString + "%");
+        }
+
+        WeatherData.WeatherElement ciElement = getWeatherElementByName(location, "CI");
+        if(ciElement != null && ciElement.getTime().size() > 0){
+            String ciString = ciElement.getTime().get(0).getParameter().getParameterName();
+            wv.ciTextView.setText(ciString);
+        }
+
+    }
+
+    private WeatherData.Location getWeatherByCity(String city) {
+        WeatherData weatherData = readWeatherJson();
+        if (weatherData != null) {
+            //找到符合的縣市
+            for (WeatherData.Location location : weatherData.getRecords().getLocation()){
+                if (location.getLocationName().equals(city)){
+                    return location;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    //Wx, 多雲
+    //PoP, 降雨機率 10%
+    //MinT, 17
+    //CI, 稍有寒意至舒適
+    //MaxT, 23C
+    private WeatherData.WeatherElement getWeatherElementByName(WeatherData.Location location, String elementName) {
+        if (location != null) {
+            //找到符合的縣市
+            for (WeatherData.WeatherElement weatherElement : location.getWeatherElement()){
+                if (weatherElement.getElementName().equals(elementName)){
+                    return weatherElement;
+                }
+            }
+        }
+
+        return null;
     }
 
     private void requestLocationUpdate() {

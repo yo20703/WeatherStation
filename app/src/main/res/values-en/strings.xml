@@ -8,4 +8,6 @@
     <string name="granted_permission_message">Please agree to all permissions. If you refuse, you will not be able to use full functions. Do you want to continue?…</string>
     <string name="button_continue">continue</string>
     <string name="button_exit">exit</string>
+    <string name="weather_loading">weather loading...</string>
+    <string name="rainfall_loading">30%</string>
 </resources>

@@ -21,6 +21,8 @@ public class WeatherData {
         return result;
     }
 
+    public Records getRecords() { return records; }
+
     public static class Result {
         @SerializedName("resource_id")
         private String resourceId;
@@ -133,6 +135,8 @@ public class WeatherData {
         @SerializedName("parameterValue")
         private String parameterValue;
 
+        @SerializedName("parameterUnit")
+        private String parameterUnit;
 
         public String getParameterName() {
             return parameterName;
@@ -142,6 +146,7 @@ public class WeatherData {
             return parameterValue;
         }
 
+        public String getParameterUnit() { return parameterUnit; }
     }
 }
 

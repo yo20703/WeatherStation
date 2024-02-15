@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/datetime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"/>
+
+    <TextView
+        android:id="@+id/currentWeatherTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/datetime"
+        android:layout_marginTop="8dp"
+        android:text="@string/weather_loading"/>
+
+    <TextView
+        android:id="@+id/highLowTemperatureTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/datetime"
+        android:layout_marginStart="10dp"
+        android:layout_toEndOf="@+id/currentWeatherTextView"
+        android:layout_marginTop="8dp"
+        android:text="@string/high_loading_low_loading"/>
+
+    <TextView
+        android:id="@+id/rainfallChance"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/highLowTemperatureTextView"
+        android:text="@string/rainfall_loading"
+        android:layout_marginTop="8dp"/>
+
+    <TextView
+        android:id="@+id/ci"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/rainfallChance"
+        android:layout_marginTop="8dp"/>
+</RelativeLayout>
